@@ -16,8 +16,7 @@ def wait_for(condition_function):
       time.sleep(0.1)
   raise Exception('Timeout')
 
-def click_through_to_new_page(br, id_text):
-  elem = br.find_elements_by_id(id_text)[0]
+def click_through_to_new_page(elem):
   elem.click()
 
   def link_has_gone_stale():
@@ -30,8 +29,27 @@ def click_through_to_new_page(br, id_text):
 
   wait_for(link_has_gone_stale)
 
+def process_data(br, n):
+    attractions = br.find_elements_by_class_name('attraction_element')
+    print len(attractions)
+    to_present = n
+    print to_present
 
+    for e in attractions:
+        to_present -= 1
+        if to_present < 0:
+            break
+          
+        print e.find_element_by_tag_name('a').get_attribute('href')
+        e.find_element_by_tag_name('a').send_keys(Keys.CONTROL + Keys.RETURN)
 
+    if to_present >= 0:
+        pagination = br.find_element_by_class_name('pagination')
+        nxt = br.find_elements_by_link_text('Next')
+        if len(nxt) == 0:
+            return
+        click_through_to_new_page(nxt[0])
+        process_data(br, to_present)
 
 
 
@@ -46,7 +64,8 @@ else:
 
 
 #TODO move chromedriver to $PATH
-br = webdriver.Chrome('/Users/hubert/Downloads/chromedriver')
+#br = webdriver.Chrome('/Users/hubert/Downloads/chromedriver')
+br = webdriver.Chrome()
 #br = webdriver.Firefox()
 
 br.get('http://tripadvisor.com/Attractions')
@@ -60,19 +79,30 @@ main_input.send_keys(arg)
 
 #buttons = br.find_elements_by_id('SUBMIT_THINGS_TO_DO')
 #buttons[0].click()
-click_through_to_new_page(br, 'SUBMIT_THINGS_TO_DO')
+click_through_to_new_page(br.find_elements_by_id('SUBMIT_THINGS_TO_DO')[0])
 
-attractions = br.find_elements_by_class_name('attraction_element')
+#attractions = br.find_elements_by_class_name('attraction_element')
 
-attractions2 = br.find_elements_by_id('ATTR_ENTRY_')
+#attractions2 = br.find_elements_by_id('ATTR_ENTRY_')
 
-print len(attractions)
-print len(attractions2)
+#print len(attractions)
+#print len(attractions2)
 
-for e in attractions:
+
+to_present = 10
+if len(sys.argv) > 2:
+    to_present = int(sys.argv[2])
+
+process_data(br, to_present)
+
+#for e in attractions:
+#    to_present -= 1
+#    if to_present < 0:
+#        break
+
     #print e.find_element_by_class_name('listing_title').text
     #print e.find_element_by_tag_name('a').text
-    print e.find_element_by_tag_name('a').get_attribute('href')
+#    print e.find_element_by_tag_name('a').get_attribute('href')
     #webbrowser.open(e.find_element_by_tag_name('a').get_attribute('href'))
-    e.find_element_by_tag_name('a').send_keys(Keys.CONTROL + Keys.RETURN)
+#    e.find_element_by_tag_name('a').send_keys(Keys.CONTROL + Keys.RETURN)
 
