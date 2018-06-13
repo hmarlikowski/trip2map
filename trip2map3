@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+
+import webbrowser, sys, requests, bs4, time
+from selenium import webdriver
+from selenium.common.exceptions import StaleElementReferenceException
+from selenium.webdriver.common.keys import Keys
+
+
+
+def wait_for(condition_function):
+  start_time = time.time()
+  while time.time() < start_time + 3:
+    if condition_function():
+      return True
+    else:
+      time.sleep(0.1)
+  raise Exception('Timeout')
+
+def click_through_to_new_page(br, id_text):
+  elem = br.find_elements_by_id(id_text)[0]
+  elem.click()
+
+  def link_has_gone_stale():
+    try:
+      # poll the link with an arbitrary call
+      elem.find_elements_by_id('doesnt-matter')
+      return False
+    except StaleElementReferenceException:
+      return True
+
+  wait_for(link_has_gone_stale)
+
+
+
+
+
+
+
+
+arg = ''
+if len(sys.argv) > 1:
+    arg = sys.argv[1]
+else:
+    print 'Argument required'
+    sys.exit()
+
+
+#TODO move chromedriver to $PATH
+br = webdriver.Chrome('/Users/hubert/Downloads/chromedriver')
+#br = webdriver.Firefox()
+
+br.get('http://tripadvisor.com/Attractions')
+
+
+inputs = br.find_elements_by_class_name('typeahead_input')
+
+main_input = inputs[0]
+main_input.send_keys(arg)
+
+
+#buttons = br.find_elements_by_id('SUBMIT_THINGS_TO_DO')
+#buttons[0].click()
+click_through_to_new_page(br, 'SUBMIT_THINGS_TO_DO')
+
+attractions = br.find_elements_by_class_name('attraction_element')
+
+attractions2 = br.find_elements_by_id('ATTR_ENTRY_')
+
+print len(attractions)
+print len(attractions2)
+
+for e in attractions:
+    #print e.find_element_by_class_name('listing_title').text
+    #print e.find_element_by_tag_name('a').text
+    print e.find_element_by_tag_name('a').get_attribute('href')
+    #webbrowser.open(e.find_element_by_tag_name('a').get_attribute('href'))
+    e.find_element_by_tag_name('a').send_keys(Keys.CONTROL + Keys.RETURN)
+
