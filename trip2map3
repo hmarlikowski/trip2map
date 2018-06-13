@@ -52,10 +52,6 @@ def process_data(br, n):
         click_through_to_new_page(nxt)
         process_data(br, to_present)
 
-
-
-
-
 arg = ''
 if len(sys.argv) > 1:
     arg = sys.argv[1]
@@ -64,46 +60,14 @@ else:
     sys.exit()
 
 
-#TODO move chromedriver to $PATH
-#br = webdriver.Chrome('/Users/hubert/Downloads/chromedriver')
 br = webdriver.Chrome()
-#br = webdriver.Firefox()
-
 br.get('http://tripadvisor.com/Attractions')
 
-
 inputs = br.find_elements_by_class_name('typeahead_input')
-
 main_input = inputs[0]
 main_input.send_keys(arg)
-
-
-#buttons = br.find_elements_by_id('SUBMIT_THINGS_TO_DO')
-#buttons[0].click()
 click_through_to_new_page(br.find_elements_by_id('SUBMIT_THINGS_TO_DO')[0])
-
-#attractions = br.find_elements_by_class_name('attraction_element')
-
-#attractions2 = br.find_elements_by_id('ATTR_ENTRY_')
-
-#print len(attractions)
-#print len(attractions2)
-
 
 to_present = 10
 if len(sys.argv) > 2:
     to_present = int(sys.argv[2])
-
-process_data(br, to_present)
-
-#for e in attractions:
-#    to_present -= 1
-#    if to_present < 0:
-#        break
-
-    #print e.find_element_by_class_name('listing_title').text
-    #print e.find_element_by_tag_name('a').text
-#    print e.find_element_by_tag_name('a').get_attribute('href')
-    #webbrowser.open(e.find_element_by_tag_name('a').get_attribute('href'))
-#    e.find_element_by_tag_name('a').send_keys(Keys.CONTROL + Keys.RETURN)
-
