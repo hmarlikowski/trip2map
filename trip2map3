@@ -2,10 +2,8 @@
 
 import webbrowser, sys, requests, bs4, time
 from selenium import webdriver
-from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException
 from selenium.webdriver.common.keys import Keys
-
-
 
 def wait_for(condition_function):
   start_time = time.time()
@@ -44,11 +42,14 @@ def process_data(br, n):
         e.find_element_by_tag_name('a').send_keys(Keys.CONTROL + Keys.RETURN)
 
     if to_present >= 0:
-        pagination = br.find_element_by_class_name('pagination')
-        nxt = br.find_elements_by_link_text('Next')
-        if len(nxt) == 0:
+        pagination = None
+        nxt = None
+        try:
+            br.find_element_by_class_name('pagination')
+            nxt = br.find_element_by_link_text('Next')
+        except NoSuchElementException:
             return
-        click_through_to_new_page(nxt[0])
+        click_through_to_new_page(nxt)
         process_data(br, to_present)
 
 
